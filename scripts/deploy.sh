@@ -22,7 +22,7 @@ elif [ -f .env ]; then                   # cas local : on copie notre .env
 fi
 
 echo "==> Lancement des conteneurs"
-$SSH 'cd ~/trashnet && docker compose up -d --build --remove-orphans && docker compose ps'
+$SSH 'cd ~/trashnet && docker compose up -d --build --remove-orphans && docker compose restart nginx && docker compose ps'
 
 echo "==> Vérification"
 for i in $(seq 1 30); do
