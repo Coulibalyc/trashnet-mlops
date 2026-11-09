@@ -1,0 +1,33 @@
+# Pipeline CD : à chaque push sur main -> tests -> déploiement automatique sur la VM AWS
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:      # bouton "Run workflow" dans GitHub
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r api/requirements.txt pytest httpx
+      - run: pytest -q tests
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/trashnet
+          chmod 600 ~/.ssh/trashnet
+      - name: Déploiement
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: ./scripts/deploy.sh ${{ secrets.VM_HOST }}

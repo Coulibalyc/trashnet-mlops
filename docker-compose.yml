@@ -1,0 +1,64 @@
+# Lance tout le système avec UNE commande :   docker compose up -d --build
+services:
+
+  postgres:                     # base de données : utilisateurs + historique des prédictions
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: trashnet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trashnet}
+      POSTGRES_DB: trashnet
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trashnet"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mlflow:                       # suivi des entraînements + versionnage du modèle
+    image: ghcr.io/mlflow/mlflow:v3.18.0
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts --serve-artifacts
+      --allowed-hosts "*"
+    volumes: [mlflow:/mlflow]
+    ports: ["5050:5000"]
+    restart: unless-stopped
+
+  api:                          # le modèle servi en web service (FastAPI + ONNX Runtime)
+    build: ./api
+    image: trashnet-api
+    environment:
+      DATABASE_URL: postgresql://trashnet:${POSTGRES_PASSWORD:-trashnet}@postgres:5432/trashnet
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-change-me}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_MODEL_URI: models:/trashnet-classifier@champion
+      MODEL_PATH: /models/model_int8.onnx          # secours si MLflow est vide
+      ROOT_PATH: /api
+      ORT_THREADS: "1"
+      MLFLOW_HTTP_REQUEST_MAX_RETRIES: "2"         # si MLflow ne répond pas : on démarre vite avec le modèle local
+      MLFLOW_HTTP_REQUEST_TIMEOUT: "10"
+    volumes: ["./models:/models:ro"]
+    deploy:
+      replicas: ${API_REPLICAS:-3}                 # scaling horizontal : 3 copies de l'API
+    depends_on:
+      postgres: {condition: service_healthy}
+      mlflow: {condition: service_started}
+    restart: unless-stopped
+
+  ui:                           # interface web
+    build: ./ui
+    environment:
+      API_URL: http://nginx/api
+    restart: unless-stopped
+
+  nginx:                        # porte d'entrée unique + load balancer
+    image: nginx:1.27-alpine
+    volumes: ["./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"]
+    ports: ["80:80"]
+    depends_on: [api, ui]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  mlflow:

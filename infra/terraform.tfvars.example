@@ -1,0 +1,2 @@
+# Copier en terraform.tfvars et mettre votre IP (curl ifconfig.me)
+my_ip = "1.2.3.4/32"

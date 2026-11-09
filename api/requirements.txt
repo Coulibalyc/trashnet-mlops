@@ -1,0 +1,11 @@
+fastapi==0.115.*
+uvicorn[standard]==0.32.*
+python-multipart
+onnx
+onnxruntime
+numpy
+pillow
+scipy
+sqlalchemy==2.*
+psycopg2-binary
+mlflow-skinny

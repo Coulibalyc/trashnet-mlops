@@ -1,0 +1,16 @@
+torch
+torchvision
+timm
+onnx
+onnxscript
+onnxruntime
+mlflow
+scikit-learn
+scipy
+numpy
+pillow
+sqlalchemy
+matplotlib
+pytest
+httpx
+locust

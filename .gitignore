@@ -1,0 +1,12 @@
+data/
+mlruns/
+mlartifacts/
+*.db
+.env
+__pycache__/
+.venv/
+infra/.terraform/
+infra/*.tfstate*
+infra/terraform.tfvars
+models/model_fp32.onnx
+results/locust*
