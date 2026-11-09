@@ -10,3 +10,4 @@ infra/*.tfstate*
 infra/terraform.tfvars
 models/model_fp32.onnx
 results/locust*
+venv/
