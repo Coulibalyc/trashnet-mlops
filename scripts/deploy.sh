@@ -4,7 +4,7 @@
 set -euo pipefail
 HOST="${1:?Usage: ./scripts/deploy.sh <IP>}"
 KEY="${SSH_KEY:-$HOME/.ssh/trashnet}"
-SSH="ssh -i $KEY -o StrictHostKeyChecking=accept-new ubuntu@$HOST"
+SSH="ssh -i $KEY -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ubuntu@$HOST"
 
 echo "==> Attente de Docker sur la VM"
 $SSH 'until command -v docker >/dev/null; do sleep 5; done'
@@ -12,7 +12,7 @@ $SSH 'until command -v docker >/dev/null; do sleep 5; done'
 echo "==> Copie du code"
 rsync -az --delete -e "ssh -i $KEY -o StrictHostKeyChecking=accept-new" \
   --exclude .git --exclude data --exclude 'infra/.terraform*' --exclude 'infra/*.tfstate*' \
-  --exclude .env --exclude results ./ "ubuntu@$HOST:~/trashnet/"
+  --exclude .env --exclude results --exclude venv --exclude .venv --exclude node_modules ./ "ubuntu@$HOST:~/trashnet/"
 
 echo "==> Fichier .env"
 if [ -n "${ADMIN_TOKEN:-}" ]; then      # cas GitHub Actions : secrets -> .env

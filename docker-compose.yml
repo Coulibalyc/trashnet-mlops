@@ -54,11 +54,15 @@ services:
 
   nginx:                        # porte d'entrée unique + load balancer
     image: nginx:1.27-alpine
-    volumes: ["./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"]
-    ports: ["80:80"]
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/gen-cert.sh:/docker-entrypoint.d/05-gen-cert.sh:ro
+      - nginxcerts:/etc/nginx/certs
+    ports: ["80:80", "443:443"]
     depends_on: [api, ui]
     restart: unless-stopped
 
 volumes:
   pgdata:
   mlflow:
+  nginxcerts:
