@@ -1,0 +1,44 @@
+[
+ {
+  "case": "Prédiction sans token",
+  "expected": 401,
+  "got": 401,
+  "ok": true
+ },
+ {
+  "case": "Prédiction avec un faux token",
+  "expected": 401,
+  "got": 401,
+  "ok": true
+ },
+ {
+  "case": "Prédiction avec un bon token",
+  "expected": 200,
+  "got": 200,
+  "ok": true
+ },
+ {
+  "case": "Fichier qui n'est pas une image",
+  "expected": 400,
+  "got": 400,
+  "ok": true
+ },
+ {
+  "case": "Image de plus de 5 Mo",
+  "expected": 413,
+  "got": 413,
+  "ok": true
+ },
+ {
+  "case": "Route admin avec un token utilisateur",
+  "expected": 401,
+  "got": 401,
+  "ok": true
+ },
+ {
+  "case": "Route admin avec la clé admin",
+  "expected": 200,
+  "got": 200,
+  "ok": true
+ }
+]

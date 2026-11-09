@@ -1,0 +1,44 @@
+[
+ {
+  "version": 1,
+  "aliases": [],
+  "model": "efficientnet-b0",
+  "fp32_acc": 0.6710875331564987,
+  "epochs": 1,
+  "test_acc": 0.6259946949602122,
+  "size_mb": 4.794723,
+  "latency_ms": 7.889502000011817
+ },
+ {
+  "version": 2,
+  "aliases": [],
+  "model": "efficientnet-b0",
+  "fp32_acc": 0.8885941644562334,
+  "epochs": 12,
+  "test_acc": 0.649867374005305,
+  "size_mb": 4.794725,
+  "latency_ms": 8.458578000045236
+ },
+ {
+  "version": 3,
+  "aliases": [],
+  "model": "efficientnet-lite0",
+  "fp32_acc": 0.7639257294429708,
+  "epochs": 2,
+  "test_acc": 0.7480106100795756,
+  "size_mb": 3.821853,
+  "latency_ms": 4.178812000191101
+ },
+ {
+  "version": 4,
+  "aliases": [
+   "champion"
+  ],
+  "model": "efficientnet-lite0",
+  "fp32_acc": 0.9257294429708223,
+  "epochs": 14,
+  "test_acc": 0.9151193633952255,
+  "size_mb": 3.821853,
+  "latency_ms": 4.2155190003541065
+ }
+]

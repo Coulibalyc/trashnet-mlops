@@ -196,9 +196,10 @@ def mlflow_versions():
         os.environ.setdefault("MLFLOW_TRACKING_URI", "http://localhost:5050")
         c = MlflowClient()
         out = []
+        aliases = c.get_registered_model("trashnet-classifier").aliases   # {"champion": "4"}
         for v in sorted(c.search_model_versions("name='trashnet-classifier'"), key=lambda v: int(v.version)):
             m = c.get_run(v.run_id).data
-            out.append({"version": int(v.version), "aliases": list(v.aliases),
+            out.append({"version": int(v.version), "aliases": [a for a, ver in aliases.items() if str(ver) == str(v.version)],
                         "model": m.params.get("model", ""), "fp32_acc": m.metrics.get("fp32_accuracy"),
                         "epochs": int(m.params.get("epochs_head", 0)) + int(m.params.get("epochs_finetune", 0)),
                         "test_acc": m.metrics.get("int8_accuracy"), "size_mb": m.metrics.get("int8_size_mb"),

@@ -1,6 +1,7 @@
 """Base de données : les utilisateurs (tokens) et l'historique des requêtes."""
 import hashlib
 import os
+import time
 from datetime import datetime, timezone
 
 from sqlalchemy import (Column, DateTime, Float, Integer, String, create_engine,
@@ -40,6 +41,15 @@ class Prediction(Base):
 
 
 def init_db():
+    """Crée les tables. Plusieurs API démarrent en même temps : si deux essaient
+    de créer la même table au même moment, on attend un peu et on réessaie."""
+    for attempt in range(10):
+        try:
+            Base.metadata.create_all(engine)
+            return
+        except Exception as e:
+            print(f"init_db tentative {attempt + 1} : {e.__class__.__name__}, nouvel essai...")
+            time.sleep(1 + attempt)
     Base.metadata.create_all(engine)
 
 

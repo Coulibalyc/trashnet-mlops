@@ -29,7 +29,7 @@ services:
     build: ./api
     image: trashnet-api
     environment:
-      DATABASE_URL: postgresql://trashnet:${POSTGRES_PASSWORD:-trashnet}@postgres:5432/trashnet
+      DATABASE_URL: postgresql+psycopg2://trashnet:${POSTGRES_PASSWORD:-trashnet}@postgres:5432/trashnet
       ADMIN_TOKEN: ${ADMIN_TOKEN:-change-me}
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_MODEL_URI: models:/trashnet-classifier@champion

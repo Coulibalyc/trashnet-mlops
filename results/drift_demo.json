@@ -1,0 +1,103 @@
+{
+ "normal": {
+  "status": "OK",
+  "drift_share": 0.16666666666666666,
+  "n_current": 60,
+  "features": {
+   "brightness": {
+    "p_value": 0.1466,
+    "drift": false,
+    "ref_mean": 0.637,
+    "cur_mean": 0.65
+   },
+   "contrast": {
+    "p_value": 0.9401,
+    "drift": false,
+    "ref_mean": 0.176,
+    "cur_mean": 0.177
+   },
+   "red": {
+    "p_value": 0.3394,
+    "drift": false,
+    "ref_mean": 0.673,
+    "cur_mean": 0.676
+   },
+   "green": {
+    "p_value": 0.1656,
+    "drift": false,
+    "ref_mean": 0.637,
+    "cur_mean": 0.652
+   },
+   "blue": {
+    "p_value": 0.0015,
+    "drift": true,
+    "ref_mean": 0.601,
+    "cur_mean": 0.622
+   },
+   "saturation": {
+    "p_value": 0.1693,
+    "drift": false,
+    "ref_mean": 0.177,
+    "cur_mean": 0.162
+   }
+  },
+  "label_distribution": {
+   "metal": 11,
+   "cardboard": 12,
+   "glass": 15,
+   "trash": 6,
+   "plastic": 10,
+   "paper": 6
+  }
+ },
+ "dark": {
+  "status": "DRIFT",
+  "drift_share": 0.8333333333333334,
+  "n_current": 60,
+  "features": {
+   "brightness": {
+    "p_value": 0.0,
+    "drift": true,
+    "ref_mean": 0.637,
+    "cur_mean": 0.226
+   },
+   "contrast": {
+    "p_value": 0.0,
+    "drift": true,
+    "ref_mean": 0.176,
+    "cur_mean": 0.062
+   },
+   "red": {
+    "p_value": 0.0,
+    "drift": true,
+    "ref_mean": 0.673,
+    "cur_mean": 0.235
+   },
+   "green": {
+    "p_value": 0.0,
+    "drift": true,
+    "ref_mean": 0.637,
+    "cur_mean": 0.226
+   },
+   "blue": {
+    "p_value": 0.0,
+    "drift": true,
+    "ref_mean": 0.601,
+    "cur_mean": 0.216
+   },
+   "saturation": {
+    "p_value": 0.1424,
+    "drift": false,
+    "ref_mean": 0.177,
+    "cur_mean": 0.163
+   }
+  },
+  "label_distribution": {
+   "metal": 5,
+   "glass": 18,
+   "cardboard": 11,
+   "plastic": 24,
+   "paper": 2
+  }
+ }
+}

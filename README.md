@@ -248,8 +248,9 @@ locust -f loadtest/locustfile.py --host http://<IP>/api --headless -u 50 -r 5 -t
 
 ```bash
 python scripts/make_charts.py
+cd presentation && npm install && MEASURED_ON="mesuré sur AWS m7i-flex.large" node build_deck.js
 ```
-→ regénère les graphiques du PowerPoint à partir de **tes** résultats.
+→ regénère les graphiques et le PowerPoint (`presentation/TrashNet_MLOps.pptx`) avec **tes** résultats AWS.
 
 ---
 
@@ -259,7 +260,7 @@ python scripts/make_charts.py
 
 **Scaling horizontal** : 3 copies de l'API, Nginx répartit les requêtes.
 ```bash
-docker compose up -d --scale api=5 && docker compose restart nginx
+docker compose up -d --scale api=5
 ```
 → passe à 5 copies de l'API (le header `X-Instance` montre quelle copie a répondu).
 

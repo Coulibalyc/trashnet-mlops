@@ -124,6 +124,7 @@ const tableHead = (cells) => cells.map((t) => ({ text: t, options: { bold: true,
   }
 
   // ===== 3. Données =====
+  pres.addSection({ title: "Modèle" });
   s = content("Les données : TrashNet", "Modèle");
   const order = counts.map((v, i) => i).sort((a, b) => counts[a] - counts[b]);
   s.addChart(pres.charts.BAR, [{ name: "Images", labels: order.map((i) => FR[classes[i]]), values: order.map((i) => counts[i]) }],
@@ -259,7 +260,7 @@ const tableHead = (cells) => cells.map((t) => ({ text: t, options: { bold: true,
   txt(s, "Terraform : terraform apply crée tout en ~2 min", { x: 0.6, y: 3.75, w: 12, h: 0.45, fontSize: 18, bold: true, color: GREEN });
   s.addTable([tableHead(["Ressource AWS", "Rôle", "Détail"]),
     [{ text: "aws_instance" }, { text: "la VM" }, { text: "Ubuntu 24.04 · m7i-flex.large · Docker installé au démarrage" }],
-    [{ text: "aws_security_group" }, { text: "pare-feu" }, { text: "80 public · 22 SSH · 5000 MLflow (mon IP seulement)" }],
+    [{ text: "aws_security_group" }, { text: "pare-feu" }, { text: "80 public · 22 SSH · 5050 MLflow (mon IP seulement)" }],
     [{ text: "aws_eip" }, { text: "IP fixe" }, { text: "l'adresse ne change pas au redémarrage" }],
     [{ text: "aws_key_pair" }, { text: "accès SSH" }, { text: "clé ed25519, utilisée aussi par la CD" }]],
   { x: 0.6, y: 4.3, w: 12.1, colW: [2.8, 1.8, 7.5], fontSize: 14, color: INK, rowH: 0.48, valign: "middle", border: { type: "solid", pt: 0.75, color: GRID } });
@@ -289,12 +290,13 @@ const tableHead = (cells) => cells.map((t) => ({ text: t, options: { bold: true,
   if (drift) {
     const feats = Object.keys(drift.normal.features);
     const names = { brightness: "Luminosité", contrast: "Contraste", red: "Rouge", green: "Vert", blue: "Bleu", saturation: "Saturation" };
-    const floor = (v) => Math.max(v, 1e-6);
+    const score = (p) => +Math.min(-Math.log10(Math.max(p, 1e-10)), 10).toFixed(1); // écart : plus haut = plus différent
     s.addChart(pres.charts.BAR, [
-      { name: "Images normales", labels: feats.map((f) => names[f]), values: feats.map((f) => floor(drift.normal.features[f].p_value)) },
-      { name: "Images sombres", labels: feats.map((f) => names[f]), values: feats.map((f) => floor(drift.dark.features[f].p_value)) }],
-    chartBase({ x: 0.6, y: 1.4, w: 8.4, h: 5.3, barDir: "col", chartColors: [GREEN, ORANGE], barGapWidthPct: 60, showLegend: true,
-      valAxisLogScaleBase: 10, valAxisMinVal: 0.000001, valAxisMaxVal: 1, valAxisLabelFormatCode: "0.0E+0", showTitle: true, title: "p-value du test KS (plus bas = plus différent, seuil 0,05)" }));
+      { name: "Images normales", labels: feats.map((f) => names[f]), values: feats.map((f) => score(drift.normal.features[f].p_value)) },
+      { name: "Images sombres", labels: feats.map((f) => names[f]), values: feats.map((f) => score(drift.dark.features[f].p_value)) }],
+    chartBase({ x: 0.6, y: 1.4, w: 8.4, h: 5.0, barDir: "col", chartColors: [GREEN, ORANGE], barGapWidthPct: 60, showLegend: true,
+      valAxisMinVal: 0, valAxisMaxVal: 11, showTitle: true, title: "Écart avec les données d'entraînement (−log10 p-value)" }));
+    txt(s, "Drift si l'écart dépasse 1,3 (p < 0,05) sur au moins 3 mesures sur 6", { x: 0.6, y: 6.4, w: 8.4, h: 0.4, fontSize: 13, color: MUTED, italic: true });
     const badge = (label, status, y, col) => {
       card(s, 9.4, y, 3.35, 2.2, TINT, "badge-" + status);
       txt(s, label, { x: 9.7, y: y + 0.25, w: 2.9, h: 0.4, fontSize: 15, color: MUTED });
@@ -381,7 +383,7 @@ const tableHead = (cells) => cells.map((t) => ({ text: t, options: { bold: true,
       valAxisHidden: true, valGridLine: { style: "none" }, valAxisMinVal: 0, valAxisMaxVal: Math.max(r1.p95, r3.p95) * 1.2, showTitle: true, title: "Latence (ms) — plus bas = mieux" }));
     card(s, 10.4, 1.6, 2.35, 4.3, TINT, "scale-card");
     stat(s, "×" + num(r3.rps / r1.rps), "de débit", 10.65, 1.85, 2.0, GREEN, 44);
-    stat(s, "−" + Math.round((1 - r3.p95 / r1.p95) * 100) + " %", "de latence p95", 10.65, 3.85, 2.0, GREEN, 44);
+    stat(s, "−" + Math.round((1 - r3.p50 / r1.p50) * 100) + " %", "de latence médiane", 10.65, 3.85, 2.0, GREEN, 44);
     txt(s, `Même charge : ${MEASURED}. Commande : docker compose up -d --scale api=3`, { x: 0.6, y: 6.25, w: 12, h: 0.4, fontSize: 12, color: MUTED, italic: true });
   }
 
@@ -389,7 +391,7 @@ const tableHead = (cells) => cells.map((t) => ({ text: t, options: { bold: true,
   pres.addSection({ title: "Conclusion" });
   s = pres.addSlide({ masterName: "TITLE_DARK", sectionTitle: "Conclusion" });
   txt(s, "En résumé", { x: 0.8, y: 0.6, w: 11, h: 0.9, fontSize: 40, bold: true, color: "FFFFFF" });
-  const big = [[pct(b.int8.accuracy, 0), "accuracy en production"], [num(b.int8.size_mb) + " Mo", "modèle quantizé"], [run3 ? Math.round(run3.rps) + " req/s" : "–", "sous charge, 0 erreur"], ["7", "conteneurs, 1 commande"]];
+  const big = [[pct(b.int8.accuracy, 1), "accuracy en production"], [num(b.int8.size_mb) + " Mo", "modèle quantizé"], [run3 ? Math.round(run3.rps) + " req/s" : "–", "sous charge, 0 erreur"], ["7", "conteneurs, 1 commande"]];
   big.forEach(([v, l], i) => {
     const x = 0.8 + i * 3.05;
     txt(s, v, { x, y: 2.0, w: 2.9, h: 1.0, fontSize: 46, bold: true, color: MOSS });
